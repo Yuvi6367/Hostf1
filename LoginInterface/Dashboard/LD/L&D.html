@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title >Labour Management UI</title>
+    <link rel="stylesheet" href="L&D.css">
+    <link rel="stylesheet" href="test.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Ysabeau+SC:wght@1..1000&display=swap"
+        rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+
+</html>
+
+<body>
+    <div class="container">
+        <!-- Site Selector -->
+        <button class="site-selector" id="open-selector">
+            <span id="selected-site" data-i18n="L&D.selected_site">Demo Site</span>
+            <span id="arrow-icon" data-i18n="L&D.arrow_icon">▼</span>
+        </button>
+    
+        <!-- Sliding Popup -->
+        <div class="site-popup" id="site-popup">
+            <div class="popup-header">
+                <span data-i18n="L&D.popup_header">Select Site</span>
+                <button class="close-button" id="close-popup" data-i18n="L&D.close_popup">✕</button>
+            </div>
+            <ul id="site-list">
+                <li class="site-option" data-site="Demo Site">
+                    <span data-i18n="L&D.site_option">Demo Site</span>
+                    <button class="delete-site" data-site="Demo Site" data-i18n="L&D.delete_site">Delete</button>
+                </li>
+            </ul>
+            <div class="add-site-container">
+                <input type="text" id="new-site" placeholder="Add new site" data-i18n="L&D.add_new_site" />
+                <button id="add-site-button" data-i18n="L&D.add_site_button">+ Add</button>
+            </div>
+            <button id="save-button" class="save-button" data-i18n="L&D.save_button">Save</button>
+        </div>
+    
+        <!-- Overlay -->
+        <div class="overlay" id="overlay"></div>
+    
+        <!-- Delete Confirmation Popup -->
+        <div class="delete-popup" id="delete-popup">
+            <div class="delete-content">
+                <p data-i18n="L&D.delete_confirmation">Are you sure you want to delete <strong id="site-to-delete"></strong>?</p>
+                <div class="popup-actions">
+                    <button id="confirm-delete" class="confirm-button" data-i18n="L&D.confirm_delete">Yes</button>
+                    <button id="cancel-delete" class="cancel-button" data-i18n="L&D.cancel_delete">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="tabs">
+        <button data-i18n="L&D.payments">Payments</button>
+        <button data-i18n="L&D.add_labour">Add Labour</button>
+    </div>
+    <div class="date-selector">
+        <button class="nav-button" onclick="changeDate('prev')">&lt;</button>
+        <div id="prev-date"></div>
+        <div class="selected" id="current-date"></div>
+        <div id="next-date"></div>
+        <button class="nav-button" onclick="changeDate('next')">&gt;</button>
+    </div>
+    <div class="Content01">
+        <div class="content" id="labourContent">
+            <p id="placeholder" data-i18n="L&D.no_labour_data">No Labour data available for this site or category. Please add labour from manage labour in more tab</p>
+            <button class="add-labour-btn" id="addLabourBtn" data-i18n="L&D.add_labour_btn">Add Labour</button>
+        </div>
+    </div>
+    
+    <!-- Popup Form -->
+    <div class="popup-overlay" id="popup">
+        <div class="popup-form">
+            <span class="popup-close" id="closePopup" data-i18n="L&D.popup_close">&times;</span>
+    
+            <!-- 1. Header -->
+            <h3 class="full-width" data-i18n="L&D.add_labour_form">Add Labour Form</h3>
+            <hr class="full-width">
+    
+            <!-- 2. Enter Name -->
+            <div class="full-width">
+                <label data-i18n="L&D.enter_name">Enter Name</label>
+                <input type="text" id="labourName" required="">
+            </div>
+    
+            <!-- 3. Salary Type and Rate Per Day -->
+            <div class="salary-grid full-width">
+                <div>
+                    <label data-i18n="L&D.salary_type">Salary Type</label>
+                    <select id="salaryType">
+                        <option data-i18n="L&D.daily_salary">Daily Salary</option>
+                        <option data-i18n="L&D.monthly_salary">Monthly Salary</option>
+                    </select>
+                </div>
+                <div>
+                    <label data-i18n="L&D.rate_per_day">Rate Per Day</label>
+                    <input type="number" id="ratePerDay" placeholder="0">
+                </div>
+            </div>
+    
+            <!-- 4. Labour Category and "+" Button -->
+            <div class="dropdown-button full-width">
+                <div style="flex: 1;">
+                    <label data-i18n="L&D.labour_category">Labour Category</label>
+                    <select id="labourCategory">
+                        <option value="" data-i18n="L&D.select_category">Select</option>
+                    </select>
+                </div>
+                <button id="addCategoryBtn" class="plus-button">+</button>
+            </div>
+    
+            <!-- 5. Aadhar Number -->
+            <div class="full-width">
+                <label data-i18n="L&D.aadhar_number">Aadhar Number</label>
+                <input type="text" id="aadharNumber" placeholder="">
+            </div>
+    
+            <!-- 6. Start Date -->
+            <div class="full-width">
+                <label data-i18n="L&D.start_date">Start Date</label>
+                <input type="date" id="startDate">
+            </div>
+    
+            <!-- 7. Additional Details -->
+            <div class="full-width">
+                <label data-i18n="L&D.additional_details">Additional Details</label>
+                <input type="text" id="additionalDetails" placeholder="">
+            </div>
+    
+            <!-- 8. Create Labour Button -->
+            <div class="full-width">
+                <button id="createLabourBtn" type="submit" data-i18n="L&D.create_labour">Create Labour</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Category Popup -->
+    <div class="popup-overlayCat" id="categoryPopup" style="display: none;">
+        <div class="popup-form">
+            <span class="popup-closeCat" id="closeCategoryPopup" data-i18n="L&D.popup_closeCat">&times;</span>
+            <h3 data-i18n="L&D.add_new_category">Add New Category</h3>
+            <input type="text" id="newCategory" placeholder="Enter Category Name" data-i18n="L&D.enter_category_name" />
+            <button class="Catbutton" id="saveCategory" data-i18n="L&D.save_category">Save Category</button>
+        </div>
+    </div>
+    <div id="overtimeForm" class="overtime-form">
+        <div class="handle"></div>
+        <p id="overtimeName" data-i18n="L&D.overtime_for">Overtime for:</p>
+        <input type="number" id="overtimeHours" placeholder="Extra Hours" data-i18n="L&D.extra_hours" />
+        <input type="number" id="overtimeRate" placeholder="Rate per Hour" data-i18n="L&D.rate_per_hour" />
+        <div class="form-buttons">
+            <button id="overtimeSave" class="save-btn" data-i18n="L&D.overtime_save">Save</button>
+            <button id="overtimeCancel" class="cancel-btn" data-i18n="L&D.overtime_cancel">Cancel</button>
+        </div>
+        <div id="bottomMenu" class="bottom-menu hidden">
+            <div class="menu-header">
+                <span class="menu-handle"></span>
+            </div>
+            <ul class="menu-options">
+                <li id="deleteEntry" data-i18n="L&D.delete_entry">Delete Entry</li>
+                <li id="editEntry" data-i18n="L&D.edit_labour">Edit Labour</li>
+                <li id="shiftEntry" data-i18n="L&D.shift_labour">Shift Labour to Another Site</li>
+            </ul>
+        </div>
+    </div>
+    <div id="deleteWarning" class="warning-menu">
+        <div class="warning-header">
+            <div class="handle"></div>
+        </div>
+        <div class="warning-content">
+            <p data-i18n="L&D.delete_entry_warning">Are you sure you want to delete this entry?</p>
+            <div class="warning-buttons">
+                <button id="confirmDelete" class="warning-btn danger" data-i18n="L&D.warning_delete">Delete</button>
+                <button id="cancelDelete" class="warning-btn cancel" data-i18n="L&D.warning_cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="overlay" id="overlay"></div>
+    <div class="popup" style="display: none;">
+        <div class="header">
+            <div class="detailsss">
+                <div class="d">
+                    <img src="/LoginInterface/—Pngtree—american labor day yellow hard_6362851.png" alt="">
+                </div>
+                <div class="detail">
+                    <div class="title" data-i18n="L&D.labour">Labour</div>
+                    <div class="category" data-i18n="L&D.category_name">Category Name</div>
+                </div>
+            </div>
+            <hr class="separator">
+        </div>
+    
+        <div class="month-switcher">
+            <button class="btn-share">
+                <i class='bx bxs-share-alt'></i>
+            </button>
+            <button class="btn-switch" id="prevMonth">‹</button>
+            <span class="current-month">December</span>
+    
+            <button class="btn-switch" id="nextMonth">›</button>
+            <div class="year-switcher">
+                <span class="current-year">2024</span>
+                <button class="btn-dropdown" id="yearDropdown">
+                    <i class="arrow-down">▼</i>
+                </button>
+                <ul class="year-list" id="yearList" style="display: none;">
+                    <!-- Years will be dynamically populated -->
+                </ul>
+            </div>
+        </div>
+        <div class="spreadsheet">
+            <div class="row header">
+                <div class="cell" data-i18n="L&D.date">Date</div>
+                <div class="cell" data-i18n="L&D.appearance">Appearance</div>
+                <div class="cell" data-i18n="L&D.advance">Advance</div>
+            </div>
+            <div class="row" data-id="row-1">
+                <div class="cell">Sun 01</div>
+                <div class="cell">P</div>
+                <div class="cell">1000</div>
+            </div>
+        </div>
+    
+        <div class="calculator">
+            <div class="row">
+                <div class="cell" data-i18n="L&D.balance">Balance:</div>
+                <div class="cell" data-i18n="L&D.rate">Rate</div>
+                <div class="cell" data-i18n="L&D.advance_money">Advance Money</div>
+            </div>
+            <hr class="separator">
+            <div class="row">
+                <div class="cell" data-i18n="L&D.total">Total:</div>
+                <div class="cell" colspan="2">XXX</div>
+            </div>
+        </div>
+        <!-- Overlay for Bottom Popup -->
+        <div class="popup-overlay1" id="popupOverlay1"></div>
+    
+        <!-- Bottom Sliding Popup -->
+        <div class="popup1" id="popup1">
+            <!-- Date -->
+            <div class="popup-date">07-12-2024</div>
+            <hr class="stylish-hr">
+            <!-- Advance Section -->
+            <div id="advance-list" class="advance-list">
+                <!-- Example advance entry -->
+                <!-- Each new advance with delete icon will be inserted dynamically here -->
+            </div>
+            <!-- Labour Name and Category -->
+            <div class="labour-name">Labour Name</div>
+            <div class="category">Category Name</div>
+            <hr class="stylish-hr">
+            <!-- Action Buttons -->
+            <div class="action-buttons1">
+                <button class="action-btn1 green">P</button>
+                <button class="action-btn1 red">A</button>
+                <button class="action-btn1 orange">OT</button>
+                <button class="action-btn1 grey" >H</button>
+            </div>
+    
+            <!-- Bottom Separator -->
+            <hr class="bottom-hr">
+    
+            <!-- Input Box with Floating Label and Pay Button -->
+            <div class="payment-box">
+                <div class="input-container">
+                    <input type="text" id="amount" required>
+                    <label for="amount" class="floating-label" data-i18n="L&D.payment_box">Enter Amount</label>
+                    <button class="pay-btn" data-i18n="L&D.pay_button">Pay</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="test.js"></script>
+    <script type="module" src="newone.js"></script>
+    <script src="site.js"></script>
+    <script src="/Translation/scripts/translation.js"></script>
+</body>

@@ -1,0 +1,45 @@
+{
+    "index": {
+      "title": "AI Onboarding Screen",
+      "skip_button": "Skip",
+      "get_started": "Get Started",
+      "login_description": "Login to start using the app.",
+      "google_login": "Login with Google",
+      "alt_login": "Or login using email / mobile >",
+      "terms": "By registering you agree to our terms & conditions",
+      "help": "Having trouble? Contact Us"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "labour_dashboard": "Labour Dashboard",
+      "labour_dashboard_desc": "Labour Attendance & Payments",
+      "material": "Material",
+      "material_desc": "Manage materials and supplies",
+      "dpr": "DPR",
+      "dpr_desc": "Daily Progress Reports",
+      "transaction": "Transaction",
+      "transaction_desc": "Manage and track transactions",
+      "reports": "Reports",
+      "reports_desc": "Get All Reports PDF / Excel",
+      "multi_user": "Multi User",
+      "multi_user_desc": "Create Supervisor & Managers",
+      "upcoming_feature": "Upcoming Feature",
+      "upcoming_feature_desc": "Upcoming new features in app",
+      "pf_pt_report": "PF & PT Report",
+      "pf_pt_report_desc": "Report with Tax Compliance"
+    },
+    "L&D": {
+      "title": "Labour Management UI",
+      "add_labour": "Add Labour",
+      "payments": "Payments",
+      "no_labour_data": "No Labour data available for this site or category. Please add labour.",
+      "salary_type": "Salary Type",
+      "rate_per_day": "Rate Per Day",
+      "start_date": "Start Date",
+      "additional_details": "Additional Details",
+      "create_labour": "Create Labour",
+      "delete_confirmation": "Are you sure you want to delete this entry?",
+      "confirm_delete": "Delete",
+      "cancel_delete": "Cancel"
+    }
+  }
