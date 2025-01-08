@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title >Labour Management UI</title>
+    <title>Labour Management UI</title>
     <link rel="stylesheet" href="L&D.css">
     <link rel="stylesheet" href="test.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -24,7 +24,7 @@
             <span id="selected-site" data-i18n="L&D.selected_site">Demo Site</span>
             <span id="arrow-icon" data-i18n="L&D.arrow_icon">▼</span>
         </button>
-    
+
         <!-- Sliding Popup -->
         <div class="site-popup" id="site-popup">
             <div class="popup-header">
@@ -43,14 +43,15 @@
             </div>
             <button id="save-button" class="save-button" data-i18n="L&D.save_button">Save</button>
         </div>
-    
+
         <!-- Overlay -->
         <div class="overlay" id="overlay"></div>
-    
+
         <!-- Delete Confirmation Popup -->
         <div class="delete-popup" id="delete-popup">
             <div class="delete-content">
-                <p data-i18n="L&D.delete_confirmation">Are you sure you want to delete <strong id="site-to-delete"></strong>?</p>
+                <p data-i18n="L&D.delete_confirmation">Are you sure you want to delete <strong
+                        id="site-to-delete"></strong>?</p>
                 <div class="popup-actions">
                     <button id="confirm-delete" class="confirm-button" data-i18n="L&D.confirm_delete">Yes</button>
                     <button id="cancel-delete" class="cancel-button" data-i18n="L&D.cancel_delete">No</button>
@@ -71,26 +72,27 @@
     </div>
     <div class="Content01">
         <div class="content" id="labourContent">
-            <p id="placeholder" data-i18n="L&D.no_labour_data">No Labour data available for this site or category. Please add labour from manage labour in more tab</p>
+            <p id="placeholder" data-i18n="L&D.no_labour_data">No Labour data available for this site or category.
+                Please add labour from manage labour in more tab</p>
             <button class="add-labour-btn" id="addLabourBtn" data-i18n="L&D.add_labour_btn">Add Labour</button>
         </div>
     </div>
-    
+
     <!-- Popup Form -->
     <div class="popup-overlay" id="popup">
         <div class="popup-form">
             <span class="popup-close" id="closePopup" data-i18n="L&D.popup_close">&times;</span>
-    
+
             <!-- 1. Header -->
             <h3 class="full-width" data-i18n="L&D.add_labour_form">Add Labour Form</h3>
             <hr class="full-width">
-    
+
             <!-- 2. Enter Name -->
             <div class="full-width">
                 <label data-i18n="L&D.enter_name">Enter Name</label>
                 <input type="text" id="labourName" required="">
             </div>
-    
+
             <!-- 3. Salary Type and Rate Per Day -->
             <div class="salary-grid full-width">
                 <div>
@@ -105,7 +107,7 @@
                     <input type="number" id="ratePerDay" placeholder="0">
                 </div>
             </div>
-    
+
             <!-- 4. Labour Category and "+" Button -->
             <div class="dropdown-button full-width">
                 <div style="flex: 1;">
@@ -116,32 +118,32 @@
                 </div>
                 <button id="addCategoryBtn" class="plus-button">+</button>
             </div>
-    
+
             <!-- 5. Aadhar Number -->
             <div class="full-width">
                 <label data-i18n="L&D.aadhar_number">Aadhar Number</label>
                 <input type="text" id="aadharNumber" placeholder="">
             </div>
-    
+
             <!-- 6. Start Date -->
             <div class="full-width">
                 <label data-i18n="L&D.start_date">Start Date</label>
                 <input type="date" id="startDate">
             </div>
-    
+
             <!-- 7. Additional Details -->
             <div class="full-width">
                 <label data-i18n="L&D.additional_details">Additional Details</label>
                 <input type="text" id="additionalDetails" placeholder="">
             </div>
-    
+
             <!-- 8. Create Labour Button -->
             <div class="full-width">
                 <button id="createLabourBtn" type="submit" data-i18n="L&D.create_labour">Create Labour</button>
             </div>
         </div>
     </div>
-    
+
     <!-- Add Category Popup -->
     <div class="popup-overlayCat" id="categoryPopup" style="display: none;">
         <div class="popup-form">
@@ -183,7 +185,7 @@
             </div>
         </div>
     </div>
-    
+
     <div class="overlay" id="overlay"></div>
     <div class="popup" style="display: none;">
         <div class="header">
@@ -198,14 +200,14 @@
             </div>
             <hr class="separator">
         </div>
-    
+
         <div class="month-switcher">
             <button class="btn-share">
                 <i class='bx bxs-share-alt'></i>
             </button>
             <button class="btn-switch" id="prevMonth">‹</button>
             <span class="current-month">December</span>
-    
+
             <button class="btn-switch" id="nextMonth">›</button>
             <div class="year-switcher">
                 <span class="current-year">2024</span>
@@ -229,7 +231,7 @@
                 <div class="cell">1000</div>
             </div>
         </div>
-    
+
         <div class="calculator">
             <div class="row">
                 <div class="cell" data-i18n="L&D.balance">Balance:</div>
@@ -244,7 +246,7 @@
         </div>
         <!-- Overlay for Bottom Popup -->
         <div class="popup-overlay1" id="popupOverlay1"></div>
-    
+
         <!-- Bottom Sliding Popup -->
         <div class="popup1" id="popup1">
             <!-- Date -->
@@ -264,12 +266,12 @@
                 <button class="action-btn1 green">P</button>
                 <button class="action-btn1 red">A</button>
                 <button class="action-btn1 orange">OT</button>
-                <button class="action-btn1 grey" >H</button>
+                <button class="action-btn1 grey">H</button>
             </div>
-    
+
             <!-- Bottom Separator -->
             <hr class="bottom-hr">
-    
+
             <!-- Input Box with Floating Label and Pay Button -->
             <div class="payment-box">
                 <div class="input-container">
@@ -280,8 +282,14 @@
             </div>
         </div>
     </div>
-    <script type="module" src="test.js"></script>
+
     <script type="module" src="newone.js"></script>
     <script src="site.js"></script>
+    <script type="module" src="test.js"></script>
+    <script type="module" src="Script.js"></script>
+    <script type="module">
+        import { changeDate } from './Script.js';
+        window.changeDate = changeDate; // Make it available in the global scope
+    </script>
     <script src="/Translation/scripts/translation.js"></script>
 </body>

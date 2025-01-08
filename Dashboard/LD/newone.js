@@ -965,7 +965,8 @@ document.querySelector(".btn-share").addEventListener("click", async () => {
     }
 
     // Generate and share the CSV
-    await shareCSVWithMessage(labourId, selectedDate);
+    await exportToCSVV(labourId, selectedDate);
+
 });
 // Updated Export to CSV Function
 async function exportToCSV(labourId, selectedDate) {
@@ -1077,7 +1078,7 @@ async function exportToCSV(labourId, selectedDate) {
         alert("An error occurred while exporting the CSV. Please try again.");
     }
 }
-async function shareCSVWithMessage(labourId, selectedDate) {
+async function exportToCSVV(labourId, selectedDate) {
     try {
         const user = auth.currentUser;
         if (!user) {
@@ -1118,7 +1119,7 @@ async function shareCSVWithMessage(labourId, selectedDate) {
         // Build CSV rows
         const csvRows = [["Date", "Appearance", "Advance"].join(",")];
         for (let day = 1; day <= daysInMonth; day++) {
-            const date = `${selectedYear}-${String(selectedMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")};`
+            const date = `${selectedYear}-${String(selectedMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
             const attendance = monthlyAttendance.find((a) => a.date === date) || {};
 
             const appearance = attendance.status
@@ -1137,7 +1138,7 @@ async function shareCSVWithMessage(labourId, selectedDate) {
             ].join(","));
         }
 
-        // Add summary rows
+        // Add summary rows (totals)
         const ratePerDay = labourEntry.ratePerDay;
         let balance = 0;
         let totalP = 0; // Full-day attendance
@@ -1169,35 +1170,33 @@ async function shareCSVWithMessage(labourId, selectedDate) {
         csvRows.push(["Balance", balance.toFixed(2), `Rate: ${ratePerDay}, Advance Money: ${advanceMoney.toFixed(2)}`].join(","));
         csvRows.push(["Total", attendanceSummary, total.toFixed(2)].join(","));
 
+        // Generate CSV content
         const csvContent = csvRows.join("\n");
         const blob = new Blob([csvContent], { type: "text/csv" });
-        const file = new File([blob], `${labourEntry.labourName}_attendance.csv`, { type: "text/csv" });
 
-        // Share message
-        const message = `
-Labour Connect - The best application for contractors!
-Download now: https://labourconnect.example.com/download
-        `;
+        // Create a File object for sharing
+        const file = new File(
+            [blob],
+            `${labourEntry.labourName}attendance${selectedDate.toLocaleDateString("en-US", {
+                month: "long",
+                year: "numeric",
+            })}.csv`,
+            { type: "text/csv" }
+        );
 
-        // Check if Web Share API supports sharing files
+        // Check if the Web Share API is available and supports files
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
             await navigator.share({
-                title: "Labour Attendance Report",
-                text: message,
                 files: [file],
+                title: "Contractor App Attendance",
+                text: "Best application for contractors, try it right now: https://contractorapp.example.com",
             });
-            console.info("File shared successfully.");
+            console.info("CSV shared successfully.");
         } else {
-            // Fallback to downloading the file
-            console.warn("Web Share API not supported. Downloading the file instead.");
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = `${labourEntry.labourName}_attendance_${selectedDate.toLocaleDateString("en-US", { month: "long", year: "numeric" })}.csv`;
-            link.click();
-            alert("CSV downloaded. Sharing via apps is not supported on this device.");
+            alert("Your device does not support sharing files.");
         }
     } catch (error) {
-        console.error("Error sharing CSV:", error);
-        alert("An error occurred while sharing the file. Please try again.");
+        console.error("Error exporting CSV:", error);
+        alert("An error occurred while exporting the CSV. Please try again.");
     }
 }

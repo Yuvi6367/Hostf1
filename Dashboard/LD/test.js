@@ -2,7 +2,7 @@ import { auth, db } from "./firebase.js";
 import checkAuth from "./google.js";
 import { updateCalculator } from "./newone.js";
 import { addDoc, collection, getDocs, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js";
-
+export { updateButtonsForSelectedDate};
 checkAuth(); // Ensure the user is authenticated
 
 
@@ -168,12 +168,6 @@ document.addEventListener("DOMContentLoaded", () => {
 function renderNewEntry(entry) {
     const labourContent = document.getElementById("labourContent");
     const addLabourBtn = document.getElementById("addLabourBtn");
-    // Hide the placeholder
-    const placeholder = document.getElementById("placeholder");
-    if (placeholder) {
-        placeholder.style.display = "none";
-    }
-
 
     const labourEntryWrapper = document.createElement("div");
     labourEntryWrapper.className = "labour-entry-wrapper";
@@ -207,17 +201,14 @@ function renderNewEntry(entry) {
     nameSpan.className = "labour-name";
     nameSpan.textContent = entry.labourName || "No Name";
 
-    const tapHoldSpan = document.createElement("span");
-    tapHoldSpan.className = "tap-hold";
-    tapHoldSpan.textContent = "Tap & hold for more options";
-
-    labourEntryButton.append(nameSpan, tapHoldSpan);
+    labourEntryButton.append(nameSpan);
 
     labourEntryWrapper.append(actionButtons, labourEntryButton);
 
     labourContent.insertBefore(labourEntryWrapper, addLabourBtn);
-
     console.log(`New labour entry rendered: ${entry.labourName}`);
+    // Update buttons for the selected date
+    updateButtonsForSelectedDate();
 }
 // Function to show the sliding form for OT
 function showOvertimeForm(name) {
@@ -334,28 +325,51 @@ function updateLabourData(name, newData) {
 }
 
 // Function to handle the "P", "A", and "H" actions
-function updateLabourStatus(button, status) {
+async function updateLabourStatus(button, status) {
     const wrapper = button.closest(".labour-entry-wrapper");
-    const name = wrapper.querySelector(".labour-name").textContent;
+    const labourId = wrapper.getAttribute("data-id"); // Get labour ID from wrapper
+    const selectedDate = document.getElementById("current-date").querySelector("p:last-child").textContent; // Selected date from Script.js
 
-    const entries = getLabourEntries();
-    const entry = entries.find((labour) => labour.labourName === name);
-
-    if (!entry) {
-        console.info("Labour entry not found.");
-        return;
-    }
-
-    if (entry.status === status) {
-        console.info(`Current Status: ${status} `);
-    } else {
-        if (status !== "Overtime") {
-            delete entry.overtime; // Remove overtime field for non-OT actions
+    try {
+        // Verify the authenticated user
+        const user = auth.currentUser;
+        if (!user) {
+            console.error("No authenticated user found.");
+            alert("You must be logged in to update status.");
+            return;
         }
-        entry.status = status; // Update the status field
-        localStorage.setItem("labourEntries", JSON.stringify(entries));
-        console.info(`${name} marked as ${status}.`);
-        console.log("Updated Entries:", getLabourEntries());
+
+        // Reference the labor document in Firestore
+        const labourDocRef = doc(db, `users/${user.uid}/labourEntries`, labourId);
+
+        // Fetch the labor entry document
+        const labourDocSnapshot = await getDoc(labourDocRef);
+        if (!labourDocSnapshot.exists()) {
+            console.warn(`Labour entry with ID "${labourId}" not found.`);
+            alert("Labour entry not found!");
+            return;
+        }
+
+        const labourEntry = labourDocSnapshot.data();
+
+        // Ensure attendance exists for the selected date
+        let attendance = labourEntry.attendance?.find((a) => a.date === selectedDate);
+        if (!attendance) {
+            attendance = { date: selectedDate, status: "", advances: [], overtime: null };
+            labourEntry.attendance = labourEntry.attendance || [];
+            labourEntry.attendance.push(attendance);
+        }
+
+        // Update the status
+        attendance.status = status;
+
+        // Save updated attendance back to Firestore
+        await updateDoc(labourDocRef, { attendance: labourEntry.attendance });
+
+        console.info(`Labour ID "${labourId}" marked as "${status}" for ${selectedDate}.`);
+    } catch (error) {
+        console.error("Error updating labour status:", error);
+        alert("An error occurred while updating the status. Please try again.");
     }
 }
 function clearOtherStates(entry) {
@@ -363,44 +377,64 @@ function clearOtherStates(entry) {
     entry.status = null;   // Clear status
 }
 // Add a single listener for all status buttons
-document.addEventListener("click", (event) => {
+document.addEventListener("click", async (event) => {
     if (event.target.classList.contains("action-btn")) {
         const button = event.target;
         const statusMap = { P: "P", A: "A", OT: "OT", H: "H" };
 
         if (statusMap[button.textContent]) {
             const wrapper = button.closest(".labour-entry-wrapper");
-            const name = wrapper.querySelector(".labour-name").textContent;
+            const labourId = wrapper.getAttribute("data-id"); // Get labour ID
+            const selectedDate = formatSelectedDate(); // Format date as YYYY-MM-DD
 
-            const entries = getLabourEntries();
-            const entry = entries.find((labour) => labour.labourName === name);
+            try {
+                const user = auth.currentUser;
+                if (!user) {
+                    console.error("No authenticated user found.");
+                    alert("You must be logged in to update status.");
+                    return;
+                }
 
-            if (!entry) {
-                console.info("Labour entry not found.");
-                return;
+                // Reference the labor document in Firestore
+                const labourDocRef = doc(db, `users/${user.uid}/labourEntries`, labourId);
+
+                // Fetch the labor entry document
+                const labourDocSnapshot = await getDoc(labourDocRef);
+                if (!labourDocSnapshot.exists()) {
+                    console.warn(`Labour entry with ID "${labourId}" not found.`);
+                    alert("Labour entry not found!");
+                    return;
+                }
+
+                const labourEntry = labourDocSnapshot.data();
+
+                // Ensure attendance exists for the selected date
+                let attendance = labourEntry.attendance?.find((a) => a.date === selectedDate);
+                if (!attendance) {
+                    attendance = { date: selectedDate, status: "", advances: [], overtime: null };
+                    labourEntry.attendance = labourEntry.attendance || [];
+                    labourEntry.attendance.push(attendance);
+                }
+
+                // Check if the action is already triggered
+                if (attendance.status === statusMap[button.textContent]) {
+                    attendance.status = ""; // Reset status
+                    console.info(`Status cleared for ${selectedDate}`);
+                } else {
+                    attendance.status = statusMap[button.textContent]; // Update the status
+                    console.info(`Marked as ${statusMap[button.textContent]} for ${selectedDate}`);
+                }
+
+                // Save updated attendance back to Firestore
+                await updateDoc(labourDocRef, { attendance: labourEntry.attendance });
+                console.info(`Labour ID "${labourId}" updated successfully.`);
+            } catch (error) {
+                console.error("Error updating labour status:", error);
+                alert("An error occurred while updating the status. Please try again.");
             }
-
-            // Check if the action is already triggered
-            const currentStatus = entry.status;
-
-            if (currentStatus === statusMap[button.textContent]) {
-                // If the same action is already triggered, reset status to null
-                entry.status = null;
-                console.info(`Status cleared for ${name}`);
-            } else {
-                // Otherwise, update the status to the new action
-                entry.status = statusMap[button.textContent];
-                console.info(`${name} marked as ${statusMap[button.textContent]}`);
-            }
-
-            // Save updated entry back to local storage
-            localStorage.setItem("labourEntries", JSON.stringify(entries));
-
-            console.log("Updated Entries:", getLabourEntries());
         }
     }
 });
-
 // Function to toggle visibility and slide tapped button
 function toggleActionButtons(wrapper, tappedButton) {
     const actionButtons = Array.from(wrapper.querySelectorAll(".action-btn"));
@@ -627,3 +661,68 @@ window.getLabourEntries = async function () {
         });
     });
 };
+// Utility function to format the selected date as YYYY-MM-DD
+function formatSelectedDate() {
+    const currentDateElem = document.getElementById("current-date");
+    const dateText = currentDateElem.querySelector("p:last-child").textContent.trim(); // Example: "8 Jan"
+
+    // Split the text to get the day and month
+    const [day, monthAbbr] = dateText.split(" ");
+    const monthMap = {
+        Jan: "01", Feb: "02", Mar: "03", Apr: "04", May: "05", Jun: "06",
+        Jul: "07", Aug: "08", Sep: "09", Oct: "10", Nov: "11", Dec: "12"
+    };
+
+    const currentYear = new Date().getFullYear();
+    const formattedMonth = monthMap[monthAbbr]; // Map month abbreviation to number
+    const formattedDay = day.padStart(2, "0"); // Pad single-digit days with a leading zero
+
+    // Return the date in YYYY-MM-DD format
+    return `${currentYear}-${formattedMonth}-${formattedDay}`;
+}
+async function updateButtonsForSelectedDate() {
+    const user = auth.currentUser;
+    if (!user) {
+        console.warn("No user is logged in!");
+        return;
+    }
+
+    const selectedDate = formatSelectedDate(); // Format date as YYYY-MM-DD
+    const labourEntries = await getLabourEntries(); // Fetch all labour entries
+    const labourWrappers = document.querySelectorAll(".labour-entry-wrapper");
+
+    // Iterate over each labour entry wrapper
+    for (const wrapper of labourWrappers) {
+        const labourId = wrapper.getAttribute("data-id");
+        const labourEntry = labourEntries.find((entry) => entry.id === labourId);
+
+        if (!labourEntry) {
+            console.warn(`Labour entry with ID "${labourId}" not found.`);
+            continue;
+        }
+
+        // Find the attendance for the selected date
+        const attendance = labourEntry.attendance?.find((a) => a.date === selectedDate);
+
+        const buttons = wrapper.querySelectorAll(".action-btn");
+        
+        // If attendance exists, show only the button corresponding to the status
+        if (attendance) {
+            buttons.forEach((button) => {
+                if (attendance.status === button.textContent) {
+                    button.classList.remove("hidden");
+                    button.classList.add("show");
+                } else {
+                    button.classList.remove("show");
+                    button.classList.add("hidden");
+                }
+            });
+        } else {
+            // If no attendance exists, show all buttons by default
+            buttons.forEach((button) => {
+                button.classList.remove("hidden");
+                button.classList.add("show");
+            });
+        }
+    }
+}

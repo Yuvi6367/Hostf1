@@ -11,26 +11,10 @@
 // Import the functions you need from the SDKs you need
 
 
+import { updateButtonsForSelectedDate } from "./test.js";
+export{ changeDate };
 
-document.addEventListener("DOMContentLoaded", function () {
-    
-  const skipButton = document.getElementById("skip-button");
 
-  skipButton.addEventListener("click", function () {
-    window.location.href = "Dashboard/dashboard.html"; // Navigates to the dashboard page
-  });
-});
-document.addEventListener("DOMContentLoaded", () => {
-
-    // Close popups when clicking outside
-    [popup, categoryPopup].forEach((popupElement) => {
-        popupElement.addEventListener("click", (e) => {
-            if (e.target === popupElement) {
-                popupElement.style.display = "none";
-            }
-        });
-    });
-});
 let currentDate = new Date(); // Start with the current date
 
 // Function to format the date into a readable format
@@ -64,14 +48,14 @@ function updateDateDisplay() {
 }
 
 // Function to change the date when clicking next/prev
-function changeDate(direction) {
-    if (direction === 'prev') {
+async function changeDate(direction) {
+    if (direction === "prev") {
         currentDate.setDate(currentDate.getDate() - 1); // Move one day back
-    } else if (direction === 'next') {
+    } else if (direction === "next") {
         currentDate.setDate(currentDate.getDate() + 1); // Move one day forward
     }
-    updateDateDisplay();
+    updateDateDisplay(); // Update the displayed dates
+    await updateButtonsForSelectedDate(); // Update buttons for the new date
 }
-
 // Initialize the display with the current date
 updateDateDisplay();
